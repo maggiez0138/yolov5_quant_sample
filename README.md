@@ -289,8 +289,4 @@ From the engine layer information, we can see some additional `Reformat` and `Sc
 
 
 # Notes  
-During the practices, there are some common bugs around new features(such as QAT, mixed precision), which may make customers feel frustrated. TensorRT team is working on it, but still needs time to alleviate.   
-If you encounter problems, please contact us (reduced-precision-SA-vteam <reduced-precision-SA-vteam@exchange.nvidia.com>).
-Some known TensorRT bugs which was not fixed in the nvcr.io/nvidia/tensorrt:21.09-py3.  
-1. [200778538](https://nvbugswb.nvidia.com/NVBugs5/redir.aspx?url=/200778538) [Alibaba Cloud]PTQ accuracy drop caused by the failed fallback of some sensitive layers to FP16 on A10.    
-2. [200774263](https://nvbugswb.nvidia.com/NVBugs5/redir.aspx?url=/200774263) TensorRT 8 cannot output the same acc as onnxruntime.
+During the practices, there are some common bugs around new features(such as QAT, mixed precision). If you encouter any issues, please leave a message.
