@@ -1,292 +1,302 @@
-# yolov5_quant_sample
+<div align="center">
+<p>
+   <a align="left" href="https://ultralytics.com/yolov5" target="_blank">
+   <img width="850" src="https://github.com/ultralytics/yolov5/releases/download/v1.0/splash.jpg"></a>
+</p>
 
-## Introduction
+English | [简体中文](.github/README_cn.md)
+<br>
+<div>
+   <a href="https://github.com/ultralytics/yolov5/actions/workflows/ci-testing.yml"><img src="https://github.com/ultralytics/yolov5/actions/workflows/ci-testing.yml/badge.svg" alt="CI CPU testing"></a>
+   <a href="https://zenodo.org/badge/latestdoi/264818686"><img src="https://zenodo.org/badge/264818686.svg" alt="YOLOv5 Citation"></a>
+   <a href="https://hub.docker.com/r/ultralytics/yolov5"><img src="https://img.shields.io/docker/pulls/ultralytics/yolov5?logo=docker" alt="Docker Pulls"></a>
+   <br>
+   <a href="https://colab.research.google.com/github/ultralytics/yolov5/blob/master/tutorial.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+   <a href="https://www.kaggle.com/ultralytics/yolov5"><img src="https://kaggle.com/static/images/open-in-kaggle.svg" alt="Open In Kaggle"></a>
+   <a href="https://join.slack.com/t/ultralytics/shared_invite/zt-w29ei8bp-jczz7QYUmDtgo6r6KcMIAg"><img src="https://img.shields.io/badge/Slack-Join_Forum-blue.svg?logo=slack" alt="Join Forum"></a>
+</div>
 
-This is 8-bit quantization sample for yolov5.
-Both PTQ, QAT and partial quantization have been implemented, and present the accuracy results based on yolov5s.
+<br>
+<p>
+YOLOv5 🚀 is a family of object detection architectures and models pretrained on the COCO dataset, and represents <a href="https://ultralytics.com">Ultralytics</a>
+ open-source research into future vision AI methods, incorporating lessons learned and best practices evolved over thousands of hours of research and development.
+</p>
 
+<div align="center">
+   <a href="https://github.com/ultralytics">
+   <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-github.png" width="2%"/>
+   </a>
+   <img width="2%" />
+   <a href="https://www.linkedin.com/company/ultralytics">
+   <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-linkedin.png" width="2%"/>
+   </a>
+   <img width="2%" />
+   <a href="https://twitter.com/ultralytics">
+   <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-twitter.png" width="2%"/>
+   </a>
+   <img width="2%" />
+   <a href="https://www.producthunt.com/@glenn_jocher">
+   <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-producthunt.png" width="2%"/>
+   </a>
+   <img width="2%" />
+   <a href="https://youtube.com/ultralytics">
+   <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-youtube.png" width="2%"/>
+   </a>
+   <img width="2%" />
+   <a href="https://www.facebook.com/ultralytics">
+   <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-facebook.png" width="2%"/>
+   </a>
+   <img width="2%" />
+   <a href="https://www.instagram.com/ultralytics/">
+   <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-instagram.png" width="2%"/>
+   </a>
+</div>
 
-| Method | Description |
-| ------ | ------ |
-| **PTQ** | TensorRT's native PTQ |
-| **QAT** | TensorRT's quantization toolkit for PyTorch  |
-| **Partial Quantization** | Leave some quant-sensitive layers in higher precision (fp32/fp16) to improve accuracy   |
+<!--
+<a align="center" href="https://ultralytics.com/yolov5" target="_blank">
+<img width="800" src="https://github.com/ultralytics/yolov5/releases/download/v1.0/banner-api.png"></a>
+-->
 
+</div>
 
-## Notes
-**This repo is based on the release version(v5.0) of [yolov5](https://github.com/ultralytics/yolov5/).**
+## <div align="center">Documentation</div>
 
-## Code Structure 
-Focus on the modifications and additions based on the release version(v5.0) of yolov5.
-```
-├───trt                              # Directory for TensorRT's engine build(including PTQ scripts), evaluation and visualization.
-│   ├───calibrator.py                # TensorRT native PTQ's calibrator
-│   ├───demo.py                      # Run the inference on a picture, and save the visualization result.
-│   ├───eval_yolo_trt.py             # Evaluate the tensorRT engine's accuary.
-│   ├───onnx_to_trt.py               # Script for building TensorRT's engine.
-│   ├───onnx_to_trt_partialquant.py  # Script for building TensorRT's engine with partial quantization.
-│   ├───Processor.py                 # Base class for engine runtime.
-│   └───Visualizer.py                # Visualize the detection result.   
-├───utils_quant                      # Auxiliary scripts for PTQ and QAT.
-│   ├───calib_test.sh                # The simple way to search for the best calibration params.
-│   ├───check_params.py              # Check the validity of parameters for QAT. 
-│   ├───onnxrt_demo.py               # Run the onnx model, generate the results, just for debugging
-│   └───print_model_structure.py     # Print the model structure and param, just for debugging               
-├───test.py                          # Evaluation            
-├───train.py                         # Traning
-└───yolo_quant_flow.py               # The main script for QAT expriment.
-```
+See the [YOLOv5 Docs](https://docs.ultralytics.com) for full documentation on training, testing and deployment.
 
+## <div align="center">Quick Start Examples</div>
 
-## Results of Quantization
+<details open>
+<summary>Install</summary>
 
-**Please refer to [yolov5s_Reduced Precision Practice](https://drive.google.com/file/d/19DjEk31PzWMKJrEpfhKBUjfSMR9pwnne/view?usp=sharing) for detail.**
-
-Method |Calibrator |mAP<sup>val<br>0.5:0.95 |mAP<sup>val<br>0.5 |
----   |---  |---        |---         |
-PyTorch native fp32    |  |0.367     |0.558     |
-TensorRT engine fp32    |  |**0.365**    |**0.556**     |
-TensorRT's native PTQ    |IInt8MinMaxCalibrator  |0.350 |0.542 |
-TensorRT's native PTQ<br>with Partial Quantization    |IInt8MinMaxCalibrator  |**0.363** |**0.555** |
-| | | |
-Insert FakeQuant nodes &<br>Disable 4 quant-sensitive layers    |IInt8MinMaxCalibrator |0.359     |0.551     |
-QAT finetuning 20 epochs &<br>Disable 4 quant-sensitive layers  |IInt8MinMaxCalibrator |**0.363**     |**0.556**     |
-
-## Setup  
-### 1. Clone the Sample  
-```
-git clone https://gitlab-master.nvidia.com/weihuaz/yolov5_quant_sample.git
-```  
-
-### 2. Dataset Preparation
-Download the labels and images of coco2017, and unzip to the same level directory as the current project. Please refer to [Yolov5 coco2017 Preparation](https://www.freesion.com/article/15911342560/) for reference.
-```
-.
-├── coco                              # Directory for datasets 
-│   ├── annotations
-│   │   └── instances_val2017.json
-│   ├── images
-│   │   ├── train2017
-│   │   └── val2017
-│   ├── labels
-│   │   ├── train2017
-│   │   └── val2017
-│   ├── train2017.txt
-│   └── val2017.txt
-└── yolov5_quant_sample               # Quantization source code 
-```
-```
-wget https://github.com/ultralytics/yolov5/releases/download/v1.0/coco2017labels.zip         # Download the labels needed
-wget http://images.cocodataset.org/zips/train2017.zip
-wget http://images.cocodataset.org/zips/val2017.zip
-wget http://images.cocodataset.org/annotations/annotations_trainval2017.zip
-```  
-
-### 3. Docker Build and Launch
-It is recommended to use Dockerfile and the scripts under the docker folder(Run these commands under `yolov5_quant_sample` path).
-1. With the command `bash docker/build.sh`, you can build the docker.
-2. With the command `bash docker/launch.sh`, you can launch the docker. By default, docker launches with GPU:0. Change according to your needs.
-
-Tips:  
-1. If the format error occurs, such as "$'\r': command not found", please use dos2unix to convert.    
-2. If the torch version is not compatible with the cuda driver, try to install another version, for example:    
-```bash
-$ pip install --no-cache torch==1.9.1+cu111 torchvision==0.10.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
-```  
-
-### 4. Download Yolov5s Pretrained Model  
-```bash
-$ cd weights
-$ wget https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
-$ cd ..
-```  
-
-## Experiments  
-`quant_test.ipynb` is a good reference for test. 
-
-### PTQ
-
-1.  `export.py` exports a pytorch model to onnx format.
-    ```bash
-    $ python models/export.py --weights ./weights/yolov5s.pt --img 640 --batch 1 --device 0
-    ```
-
-2.  `onnx_to_trt.py` aims to build a TensorRT engine from a onnx model file, and save to the `weights` folder.
-    You can specify to build different precisions(fp32/fp16/int8).  
-    Notes: If you change the setting of the int8 calibrator, please delete the trt\yolov5s_calibration.cache. Otherwise, the change may not take effect. 
-    The setting of calibrator the batchsize for calibration, the number of calibration batch, the type of calibrator.  
-    ```bash
-    $ rm trt/yolov5s_calibration.cache
-    ```
-    
-    - Example 1: Build a int8 engine using TensorRT's native PTQ. 
-    ```bash
-    $ python trt/onnx_to_trt.py --model ./weights/yolov5s.onnx --dtype int8 --batch-size 32 --num-calib-batch 16
-    ```
-
-    - Example 2: Build a fp32 engine. 
-    ```bash
-    $ python trt/onnx_to_trt.py --model ./weights/yolov5s.onnx --dtype fp32
-    ```
-
-3.  Evaluate the accurary of TensorRT inference result.  
-   Note: The TensorRT engine name should be modified according to the output of the previous step.    
-    ```bash
-    $ python trt/eval_yolo_trt.py --model ./weights/yolov5s.trt -l
-    ```
-
-### PTQ with Partial Quantization
-`trt/onnx_to_trt_partialquant.py` aims to build a TensorRT engine with partial quantization.  
-
-1. Get the onnx model with `export.py`.  
-    ```bash
-    $ python models/export.py --weights ./weights/yolov5s.pt --img 640 --batch 1 --device 0
-    ```
-
-2. Simplify the onnx model and delete useless layers or nodes. 
-    ```bash
-    $ python -m onnxsim ./weights/yolov5s.onnx ./weights/yolov5s-simple.onnx
-    ```
-
-3. Choose the sensitive layers. Need some manual operation, please refer to the code.   
-    a) Print all the layers ids;   
-    b) Combine the onnx model structure to choose the sensitive layers  
-    ```bash
-    $ python trt/onnx_to_trt_partialquant.py --model ./weights/yolov5s-simple.onnx --dtype int8 --batch-size 32 --num-calib-batch 16
-    ```
-
-4. Evaluate the accurary of TensorRT inference result.  
-   Note: The TensorRT engine name should be modified according to the output of the previous step.    
-    ```bash
-    $ python trt/eval_yolo_trt.py --model ./weights/yolov5s-simple.trt -l
-    ```
-
-### Sensitivity Profile
-`yolo_quant_flow.py` is the main script for QAT experiment.  
-And you can do sensitivity profile by specify the flag `--sensitivity`, then build_sensitivity_profile() will be called.
-It takes a long time to complete the entire analysis, please be patient. 
-
-![Sensitivity profile of yolov5s](./data/sensitivity%20profile%20of%20yolov5s.png)  
-
-    ```bash
-    $ python yolo_quant_flow.py --data data/coco.yaml --cfg models/yolov5s.yaml --ckpt-path weights/yolov5s.pt --hyp data/hyp.qat.yaml --sensitivity
-    ```
-
-### Skip Sensitive Layers
-`yolo_quant_flow.py` is the main script for QAT experiment.  
-Add the param `--skip-layers`, then skip_sensitive_layers() will be called.  We will skip 4 quant-sensitive layers based on the sensitivity profile.
-
-
-### QAT Finetuning
-`yolo_quant_flow.py` is the main script for QAT experiment. See the code comments for details.   
-Run the script as below. The QDQ insert, calibration, QAT-finetuning and evalution will be performed.  
-QAT-Finetuning takes long time, you can skip this step and download the [post-QAT model](https://drive.google.com/file/d/1Q1u81E0yLVrwHgazTN-l38ZyEFL78ggz/view?usp=sharing) directly.     
-```
-    QAT-finetuning
-    $ python yolo_quant_flow.py --data data/coco.yaml --cfg models/yolov5s.yaml --ckpt-path weights/yolov5s.pt --hyp data/hyp.qat.yaml --skip-layers
-    
-    Build TensorRT engine
-    $ python trt/onnx_to_trt.py --model ./weights/yolov5s-qat.onnx --dtype int8 --qat
-    
-    Evaluate the accuray of TensorRT engine
-    $ python trt/eval_yolo_trt.py --model ./weights/yolov5s-qat.trt -l
-```    
-    
-If you have a QAT-finetuning Pytorch checkpoint, you can export to onnx using the command below.  
-```
-    Export to onnx
-    $ python models/export_qat.py --weights ./weights/yolov5s-qat.pt --img 640 --batch 1 --device 0 
-```
-    
-### Dynamic Shape Support  
-We can export the model with dynamic shape, specify some or all tensor dimensions until runtime. And the inference shape can be adjusted during the runtime.
-
-1. Export to ONNX with dynamic shape support(with `--dynamic`)   
-    ```bash
-    QAT model 
-    $ python models/export_qat.py --weights ./weights/yolov5s-qat.pt --img 640 --dynamic --device 0
-   
-    Common models(take fp16 as a example)
-    $ python models/export.py --weights ./weights/yolov5s.pt --img 640 --dynamic --device 0  
-    ``` 
-
-2. Build the TensorRT engine with dynamic shape support 
-     ```bash 
-    QAT model
-    $ python trt/onnx_to_trt.py --model ./weights/yolov5s-qat.onnx --dtype int8 --qat --dynamic-shape
-   
-    Common models(take fp16 as a example)
-    $ python trt/onnx_to_trt.py --model ./weights/yolov5s.onnx --dtype fp16 --dynamic-shape   
-    ``` 
-
-3. Specify the inference shape and evaluate the engine  
-   Note: The TensorRT engine name should be modified according to the output of the previous step.    
-     ```bash 
-    QAT model
-    $ python trt/trt_dynamic/eval_yolo_trt_dynamic.py --model weights/yolov5s-qat.trt -l
-   
-    Common models(take fp16 as a example)
-    $ python trt/trt_dynamic/eval_yolo_trt_dynamic.py --model weights/yolov5s.trt -l  
-    ``` 
-
-### Further Optimization (Improve QAT Throughput)    
-Since the residual block is used in the backbone of yolov5s. TensorRT has extra runtime optimization about the residual add. In order to maximize the throughput of QAT, when inserting QDQ nodes, it's recommended to add extra quantizer to the `BasicBlock` and `Bottleneck`.  
-Take the `Bottleneck` as a example(`models/common.py`). We can insert extra quantization/dequantization nodes as below.
-
-```angular2
-class Bottleneck(nn.Module):
-    # Standard bottleneck
-    def __init__(self, c1, c2, shortcut=True, g=1, e=0.5):  # ch_in, ch_out, shortcut, groups, expansion
-        super(Bottleneck, self).__init__()
-        c_ = int(c2 * e)  # hidden channels
-        self.cv1 = Conv(c1, c_, 1, 1)
-        self.cv2 = Conv(c_, c2, 3, 1, g=g)
-        self.add = shortcut and c1 == c2
-
-        # Added by maggie for QDQ debugging in order to improve throughput
-        if self.add:
-            self.residual_quantizer_1 = quant_nn.TensorQuantizer(quant_nn.QuantConv2d.default_quant_desc_input)
-            self.residual_quantizer_2 = quant_nn.TensorQuantizer(quant_nn.QuantConv2d.default_quant_desc_input)
-
-    def forward(self, x):
-        #return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
-
-        try:
-            if self.add:
-                return self.residual_quantizer_1(x) + self.residual_quantizer_2(self.cv2(self.cv1(x)))
-            else:
-                return self.cv2(self.cv1(x))
-        except AttributeError as e:
-            # Compatible with PTQ path, handle models without extra residual_quantizer
-            # print('\'Bottleneck\' object has no attribute \'residual_quantizer_1\'')
-            return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
-
-```
-
-Please refer to [TensorRT OSS/tool/pytorch-quantization/Further optimization](https://github.com/NVIDIA/TensorRT/blob/master/tools/pytorch-quantization/docs/source/tutorials/quant_resnet50.rst#further-optimization) for detail. And it is highly recommended to walk through the [Q/DQ Layer-Placement Recommendations](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#qdq-placement-recs) part of `TensorRT Developer Guide` before you start.    
-During the optimization, the following commands are needed. You can compare the results before and after the extra QDQ insertion. 
+Clone repo and install [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) in a
+[**Python>=3.7.0**](https://www.python.org/) environment, including
+[**PyTorch>=1.7**](https://pytorch.org/get-started/locally/).
 
 ```bash
-Insert QAT, do calibration and export to onnx file
-$ python yolo_quant_flow.py --data data/coco.yaml --cfg models/yolov5s.yaml --ckpt-path weights/yolov5s.pt --hyp data/hyp.qat.yaml --num-finetune-epochs=0 --skip-eval-accuracy
-
-Rename the onnx file
-$ mv weights/yolov5s.onnx ./weights/yolov5s_with_residual_quant.onnx
-
-Export to TensorRT engine
-$ python trt/onnx_to_trt.py --model ./weights/yolov5s_with_residual_quant.onnx --dtype int8 --qat --verbose
-
-Test the throughput with trtexec
-$ trtexec --loadEngine=./weights/yolov5s_with_residual_quant.trt 
+git clone https://github.com/ultralytics/yolov5  # clone
+cd yolov5
+pip install -r requirements.txt  # install
 ```
- 
-Check the onnx file with Netron, you will see the extra QDQ nodes as below. Then we can test the throughput with `trtexec`.
-![further_optimization](./data/images/further_optimization.png)
 
+</details>
 
-From the engine layer information, we can see some additional `Reformat` and `Scale` operations have gone.  
-![tactic_selection](./data/images/tactic_selection.png)
+<details open>
+<summary>Inference</summary>
 
+YOLOv5 [PyTorch Hub](https://github.com/ultralytics/yolov5/issues/36) inference. [Models](https://github.com/ultralytics/yolov5/tree/master/models) download automatically from the latest
+YOLOv5 [release](https://github.com/ultralytics/yolov5/releases).
 
-# Notes  
-During the practices, there are some common bugs around new features(such as QAT, mixed precision). If you encouter any issues, please leave a message.
+```python
+import torch
+
+# Model
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s')  # or yolov5n - yolov5x6, custom
+
+# Images
+img = 'https://ultralytics.com/images/zidane.jpg'  # or file, Path, PIL, OpenCV, numpy, list
+
+# Inference
+results = model(img)
+
+# Results
+results.print()  # or .show(), .save(), .crop(), .pandas(), etc.
+```
+
+</details>
+
+<details>
+<summary>Inference with detect.py</summary>
+
+`detect.py` runs inference on a variety of sources, downloading [models](https://github.com/ultralytics/yolov5/tree/master/models) automatically from
+the latest YOLOv5 [release](https://github.com/ultralytics/yolov5/releases) and saving results to `runs/detect`.
+
+```bash
+python detect.py --source 0  # webcam
+                          img.jpg  # image
+                          vid.mp4  # video
+                          path/  # directory
+                          path/*.jpg  # glob
+                          'https://youtu.be/Zgi9g1ksQHc'  # YouTube
+                          'rtsp://example.com/media.mp4'  # RTSP, RTMP, HTTP stream
+```
+
+</details>
+
+<details>
+<summary>Training</summary>
+
+The commands below reproduce YOLOv5 [COCO](https://github.com/ultralytics/yolov5/blob/master/data/scripts/get_coco.sh)
+results. [Models](https://github.com/ultralytics/yolov5/tree/master/models)
+and [datasets](https://github.com/ultralytics/yolov5/tree/master/data) download automatically from the latest
+YOLOv5 [release](https://github.com/ultralytics/yolov5/releases). Training times for YOLOv5n/s/m/l/x are
+1/2/4/6/8 days on a V100 GPU ([Multi-GPU](https://github.com/ultralytics/yolov5/issues/475) times faster). Use the
+largest `--batch-size` possible, or pass `--batch-size -1` for
+YOLOv5 [AutoBatch](https://github.com/ultralytics/yolov5/pull/5092). Batch sizes shown for V100-16GB.
+
+```bash
+python train.py --data coco.yaml --cfg yolov5n.yaml --weights '' --batch-size 128
+                                       yolov5s                                64
+                                       yolov5m                                40
+                                       yolov5l                                24
+                                       yolov5x                                16
+```
+
+<img width="800" src="https://user-images.githubusercontent.com/26833433/90222759-949d8800-ddc1-11ea-9fa1-1c97eed2b963.png">
+
+</details>
+
+<details open>
+<summary>Tutorials</summary>
+
+- [Train Custom Data](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data)  🚀 RECOMMENDED
+- [Tips for Best Training Results](https://github.com/ultralytics/yolov5/wiki/Tips-for-Best-Training-Results)  ☘️
+  RECOMMENDED
+- [Weights & Biases Logging](https://github.com/ultralytics/yolov5/issues/1289)  🌟 NEW
+- [Roboflow for Datasets, Labeling, and Active Learning](https://github.com/ultralytics/yolov5/issues/4975)  🌟 NEW
+- [Multi-GPU Training](https://github.com/ultralytics/yolov5/issues/475)
+- [PyTorch Hub](https://github.com/ultralytics/yolov5/issues/36)  ⭐ NEW
+- [TFLite, ONNX, CoreML, TensorRT Export](https://github.com/ultralytics/yolov5/issues/251) 🚀
+- [Test-Time Augmentation (TTA)](https://github.com/ultralytics/yolov5/issues/303)
+- [Model Ensembling](https://github.com/ultralytics/yolov5/issues/318)
+- [Model Pruning/Sparsity](https://github.com/ultralytics/yolov5/issues/304)
+- [Hyperparameter Evolution](https://github.com/ultralytics/yolov5/issues/607)
+- [Transfer Learning with Frozen Layers](https://github.com/ultralytics/yolov5/issues/1314)  ⭐ NEW
+- [Architecture Summary](https://github.com/ultralytics/yolov5/issues/6998)  ⭐ NEW
+
+</details>
+
+## <div align="center">Environments</div>
+
+Get started in seconds with our verified environments. Click each icon below for details.
+
+<div align="center">
+    <a href="https://colab.research.google.com/github/ultralytics/yolov5/blob/master/tutorial.ipynb">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-colab-small.png" width="15%"/>
+    </a>
+    <a href="https://www.kaggle.com/ultralytics/yolov5">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-kaggle-small.png" width="15%"/>
+    </a>
+    <a href="https://hub.docker.com/r/ultralytics/yolov5">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-docker-small.png" width="15%"/>
+    </a>
+    <a href="https://github.com/ultralytics/yolov5/wiki/AWS-Quickstart">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-aws-small.png" width="15%"/>
+    </a>
+    <a href="https://github.com/ultralytics/yolov5/wiki/GCP-Quickstart">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-gcp-small.png" width="15%"/>
+    </a>
+</div>
+
+## <div align="center">Integrations</div>
+
+<div align="center">
+    <a href="https://wandb.ai/site?utm_campaign=repo_yolo_readme">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-wb-long.png" width="49%"/>
+    </a>
+    <a href="https://roboflow.com/?ref=ultralytics">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-roboflow-long.png" width="49%"/>
+    </a>
+</div>
+
+|Weights and Biases|Roboflow ⭐ NEW|
+|:-:|:-:|
+|Automatically track and visualize all your YOLOv5 training runs in the cloud with [Weights & Biases](https://wandb.ai/site?utm_campaign=repo_yolo_readme)|Label and export your custom datasets directly to YOLOv5 for training with [Roboflow](https://roboflow.com/?ref=ultralytics) |
+
+<!-- ## <div align="center">Compete and Win</div>
+
+We are super excited about our first-ever Ultralytics YOLOv5 🚀 EXPORT Competition with **$10,000** in cash prizes!
+
+<p align="center">
+  <a href="https://github.com/ultralytics/yolov5/discussions/3213">
+  <img width="850" src="https://github.com/ultralytics/yolov5/releases/download/v1.0/banner-export-competition.png"></a>
+</p> -->
+
+## <div align="center">Why YOLOv5</div>
+
+<p align="left"><img width="800" src="https://user-images.githubusercontent.com/26833433/155040763-93c22a27-347c-4e3c-847a-8094621d3f4e.png"></p>
+<details>
+  <summary>YOLOv5-P5 640 Figure (click to expand)</summary>
+
+<p align="left"><img width="800" src="https://user-images.githubusercontent.com/26833433/155040757-ce0934a3-06a6-43dc-a979-2edbbd69ea0e.png"></p>
+</details>
+<details>
+  <summary>Figure Notes (click to expand)</summary>
+
+- **COCO AP val** denotes mAP@0.5:0.95 metric measured on the 5000-image [COCO val2017](http://cocodataset.org) dataset over various inference sizes from 256 to 1536.
+- **GPU Speed** measures average inference time per image on [COCO val2017](http://cocodataset.org) dataset using a [AWS p3.2xlarge](https://aws.amazon.com/ec2/instance-types/p3/) V100 instance at batch-size 32.
+- **EfficientDet** data from [google/automl](https://github.com/google/automl) at batch size 8.
+- **Reproduce** by `python val.py --task study --data coco.yaml --iou 0.7 --weights yolov5n6.pt yolov5s6.pt yolov5m6.pt yolov5l6.pt yolov5x6.pt`
+
+</details>
+
+### Pretrained Checkpoints
+
+|Model |size<br><sup>(pixels) |mAP<sup>val<br>0.5:0.95 |mAP<sup>val<br>0.5 |Speed<br><sup>CPU b1<br>(ms) |Speed<br><sup>V100 b1<br>(ms) |Speed<br><sup>V100 b32<br>(ms) |params<br><sup>(M) |FLOPs<br><sup>@640 (B)
+|---                    |---  |---    |---    |---    |---    |---    |---    |---
+|[YOLOv5n][assets]      |640  |28.0   |45.7   |**45** |**6.3**|**0.6**|**1.9**|**4.5**
+|[YOLOv5s][assets]      |640  |37.4   |56.8   |98     |6.4    |0.9    |7.2    |16.5
+|[YOLOv5m][assets]      |640  |45.4   |64.1   |224    |8.2    |1.7    |21.2   |49.0
+|[YOLOv5l][assets]      |640  |49.0   |67.3   |430    |10.1   |2.7    |46.5   |109.1
+|[YOLOv5x][assets]      |640  |50.7   |68.9   |766    |12.1   |4.8    |86.7   |205.7
+|                       |     |       |       |       |       |       |       |
+|[YOLOv5n6][assets]     |1280 |36.0   |54.4   |153    |8.1    |2.1    |3.2    |4.6
+|[YOLOv5s6][assets]     |1280 |44.8   |63.7   |385    |8.2    |3.6    |12.6   |16.8
+|[YOLOv5m6][assets]     |1280 |51.3   |69.3   |887    |11.1   |6.8    |35.7   |50.0
+|[YOLOv5l6][assets]     |1280 |53.7   |71.3   |1784   |15.8   |10.5   |76.8   |111.4
+|[YOLOv5x6][assets]<br>+ [TTA][TTA]|1280<br>1536 |55.0<br>**55.8** |72.7<br>**72.7** |3136<br>- |26.2<br>- |19.4<br>- |140.7<br>- |209.8<br>-
+
+<details>
+  <summary>Table Notes (click to expand)</summary>
+
+- All checkpoints are trained to 300 epochs with default settings. Nano and Small models use [hyp.scratch-low.yaml](https://github.com/ultralytics/yolov5/blob/master/data/hyps/hyp.scratch-low.yaml) hyps, all others use [hyp.scratch-high.yaml](https://github.com/ultralytics/yolov5/blob/master/data/hyps/hyp.scratch-high.yaml).
+- **mAP<sup>val</sup>** values are for single-model single-scale on [COCO val2017](http://cocodataset.org) dataset.<br>Reproduce by `python val.py --data coco.yaml --img 640 --conf 0.001 --iou 0.65`
+- **Speed** averaged over COCO val images using a [AWS p3.2xlarge](https://aws.amazon.com/ec2/instance-types/p3/) instance. NMS times (~1 ms/img) not included.<br>Reproduce by `python val.py --data coco.yaml --img 640 --task speed --batch 1`
+- **TTA** [Test Time Augmentation](https://github.com/ultralytics/yolov5/issues/303) includes reflection and scale augmentations.<br>Reproduce by `python val.py --data coco.yaml --img 1536 --iou 0.7 --augment`
+
+</details>
+
+## <div align="center">Contribute</div>
+
+We love your input! We want to make contributing to YOLOv5 as easy and transparent as possible. Please see our [Contributing Guide](CONTRIBUTING.md) to get started, and fill out the [YOLOv5 Survey](https://ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey) to send us feedback on your experiences. Thank you to all our contributors!
+
+<a href="https://github.com/ultralytics/yolov5/graphs/contributors"><img src="https://opencollective.com/ultralytics/contributors.svg?width=990" /></a>
+
+## <div align="center">Contact</div>
+
+For YOLOv5 bugs and feature requests please visit [GitHub Issues](https://github.com/ultralytics/yolov5/issues). For business inquiries or
+professional support requests please visit [https://ultralytics.com/contact](https://ultralytics.com/contact).
+
+<br>
+
+<div align="center">
+    <a href="https://github.com/ultralytics">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-github.png" width="3%"/>
+    </a>
+    <img width="3%" />
+    <a href="https://www.linkedin.com/company/ultralytics">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-linkedin.png" width="3%"/>
+    </a>
+    <img width="3%" />
+    <a href="https://twitter.com/ultralytics">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-twitter.png" width="3%"/>
+    </a>
+    <img width="3%" />
+    <a href="https://www.producthunt.com/@glenn_jocher">
+    <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-producthunt.png" width="3%"/>
+    </a>
+    <img width="3%" />
+    <a href="https://youtube.com/ultralytics">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-youtube.png" width="3%"/>
+    </a>
+    <img width="3%" />
+    <a href="https://www.facebook.com/ultralytics">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-facebook.png" width="3%"/>
+    </a>
+    <img width="3%" />
+    <a href="https://www.instagram.com/ultralytics/">
+        <img src="https://github.com/ultralytics/yolov5/releases/download/v1.0/logo-social-instagram.png" width="3%"/>
+    </a>
+</div>
+
+[assets]: https://github.com/ultralytics/yolov5/releases
+[tta]: https://github.com/ultralytics/yolov5/issues/303
